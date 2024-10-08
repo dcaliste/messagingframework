@@ -28,7 +28,7 @@ index 04e64e63..7d567a85 100644
  
  contains(DEFINES,USE_ACCOUNTS_QT) {
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 4b0e627a..891ce113 100644
+index 39a4c2d1..41f8a2f4 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -430,7 +430,8 @@ ImapClient::ImapClient(QObject* parent)

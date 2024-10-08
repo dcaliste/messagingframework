@@ -83,8 +83,6 @@ on the account, triggering signond to show a notification to the user.
 This mirrors the behavour of qmf-oauth2-plugin. See
 SSOOauth2Plugin::credentialsNeedUpdate() in
 base-qmf-oauth2-plugin/oauth2plugin.cpp
-
-Change-Id: Id90fddd10e205da7b807000e042f4a5b13edd4c0
 ---
  .../qmfclient/qmailaccountlistmodel.cpp       |   44 +-
  src/libraries/qmfclient/qmailstore_p.cpp      | 1235 ++++++++++++++++-

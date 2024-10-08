@@ -68,8 +68,6 @@ on the account, triggering signond to show a notification to the user.
 This mirrors the behavour of qmf-oauth2-plugin. See
 SSOOauth2Plugin::credentialsNeedUpdate() in
 base-qmf-oauth2-plugin/oauth2plugin.cpp
-
-Change-Id: If6e92e95a3a5c53ac46fe300906508804f0fd9ce
 ---
  src/libraries/qmfclient/qmfclient.pro         |  11 +
  src/libraries/qmfclient/ssoaccountmanager.cpp |  66 +++
@@ -78,12 +76,12 @@ Change-Id: If6e92e95a3a5c53ac46fe300906508804f0fd9ce
  src/libraries/qmfclient/ssoauthplugin.h       |  74 ++++
  src/libraries/qmfclient/ssosessionmanager.cpp | 388 ++++++++++++++++++
  src/libraries/qmfclient/ssosessionmanager.h   | 112 +++++
- .../qmfmessageserver/qmailauthenticator.cpp   |  19 +-
+ .../qmfmessageserver/qmailauthenticator.cpp   |  18 +-
  .../qmfmessageserver/qmailauthenticator.h     |   4 +
  .../qmfmessageserver/qmfmessageserver.pro     |   9 +
  src/libraries/qmfwidgets/qmfwidgets.pro       |   6 +
  src/plugins/messageservices/imap/imap.pro     |   7 +
- .../imap/imapauthenticator.cpp                |  89 ++++
+ .../imap/imapauthenticator.cpp                |  88 ++++
  .../messageservices/imap/imapauthenticator.h  |   5 +
  .../messageservices/imap/imapclient.cpp       | 299 +++++++++++++-
  src/plugins/messageservices/imap/imapclient.h |  29 +-
@@ -91,14 +89,14 @@ Change-Id: If6e92e95a3a5c53ac46fe300906508804f0fd9ce
  .../messageservices/imap/imapprotocol.h       |   5 +
  .../messageservices/imap/imapservice.cpp      | 101 ++++-
  src/plugins/messageservices/pop/pop.pro       |   7 +
- .../messageservices/pop/popauthenticator.cpp  |  33 +-
+ .../messageservices/pop/popauthenticator.cpp  |  32 +-
  .../messageservices/pop/popauthenticator.h    |   4 +
  src/plugins/messageservices/pop/popclient.cpp | 123 ++++++
  src/plugins/messageservices/pop/popclient.h   |  25 ++
  .../messageservices/pop/popservice.cpp        |  25 ++
  src/plugins/messageservices/smtp/smtp.pro     |   7 +
- .../smtp/smtpauthenticator.cpp                | 118 +++++-
- .../messageservices/smtp/smtpauthenticator.h  |   5 +
+ .../smtp/smtpauthenticator.cpp                | 117 +++++-
+ .../messageservices/smtp/smtpauthenticator.h  |   4 +
  .../messageservices/smtp/smtpclient.cpp       | 168 +++++++-
  src/plugins/messageservices/smtp/smtpclient.h |  28 ++
  .../messageservices/smtp/smtpservice.cpp      |   8 +
@@ -109,7 +107,7 @@ Change-Id: If6e92e95a3a5c53ac46fe300906508804f0fd9ce
  src/tools/messageserver/servicehandler.cpp    |  13 +
  tests/tst_qmailstore/tst_qmailstore.cpp       |  93 ++++-
  tests/tst_smtp/tst_smtp.pro                   |   4 +
- 38 files changed, 2414 insertions(+), 35 deletions(-)
+ 38 files changed, 2409 insertions(+), 35 deletions(-)
  create mode 100644 src/libraries/qmfclient/ssoaccountmanager.cpp
  create mode 100644 src/libraries/qmfclient/ssoaccountmanager.h
  create mode 100644 src/libraries/qmfclient/ssoauthplugin.cpp
@@ -1012,51 +1010,50 @@ index 00000000..61806ba4
 +
 +#endif // SSOSESSIONMANAGER_H
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.cpp b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
-index 81983691..01f65d69 100644
+index 16d2406d..8323a310 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.cpp
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.cpp
-@@ -148,6 +148,23 @@ QByteArray QMailAuthenticator::getAuthentication(const QMailAccountConfiguration
+@@ -147,6 +147,22 @@ QByteArray QMailAuthenticator::getAuthentication(const QMailServiceConfiguration
      should be decoded before invocation, and the result should be encoded for
      transmission.
  */
 +#ifdef USE_ACCOUNTS_QT
-+QByteArray QMailAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge,
++QByteArray QMailAuthenticator::getResponse(const QMailServiceConfiguration &svcCfg, const QByteArray &challenge,
 +                                           const QMail::SaslMechanism authType, const QString &password)
 +{
-+    QMailServiceConfiguration configuration(svcCfg);
-+    if (!configuration.value(QLatin1String("smtpusername")).isEmpty() && authType == QMail::CramMd5Mechanism) {
++    if (!svcCfg.value(QLatin1String("smtpusername")).isEmpty() && authType == QMail::CramMd5Mechanism) {
 +        // SMTP server CRAM-MD5 authentication
-+        return cramMd5Response(challenge, configuration.value(QLatin1String("smtpusername")).toUtf8(), password.toUtf8());
++        return cramMd5Response(challenge, svcCfg.value(QLatin1String("smtpusername")).toUtf8(), password.toUtf8());
 +    } else if (authType == QMail::CramMd5Mechanism) {
 +        // IMAP/POP server CRAM-MD5 authentication
-+        return cramMd5Response(challenge, configuration.value(QLatin1String("username")).toUtf8(), password.toUtf8());
++        return cramMd5Response(challenge, svcCfg.value(QLatin1String("username")).toUtf8(), password.toUtf8());
 +    }
 +
 +    // Unknown service type and/or authentication type
 +    return QByteArray();
 +}
 +#else
- QByteArray QMailAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ QByteArray QMailAuthenticator::getResponse(const QMailServiceConfiguration &svcCfg, const QByteArray &challenge)
  {
-     QMailServiceConfiguration configuration(svcCfg);
-@@ -165,4 +182,4 @@ QByteArray QMailAuthenticator::getResponse(const QMailAccountConfiguration::Serv
+     if (!svcCfg.value(QLatin1String("smtpusername")).isEmpty()
+@@ -163,4 +179,4 @@ QByteArray QMailAuthenticator::getResponse(const QMailServiceConfiguration &svcC
      // Unknown service type and/or authentication type
      return QByteArray();
  }
 -
 +#endif
 diff --git a/src/libraries/qmfmessageserver/qmailauthenticator.h b/src/libraries/qmfmessageserver/qmailauthenticator.h
-index 4e235fb1..6d7e5752 100644
+index 35e9e659..f46d34b4 100644
 --- a/src/libraries/qmfmessageserver/qmailauthenticator.h
 +++ b/src/libraries/qmfmessageserver/qmailauthenticator.h
-@@ -46,7 +46,11 @@ public:
-     static bool useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+@@ -47,7 +47,11 @@ public:
+                               const QStringList &capabilities);
      static QMail::SaslMechanism authFromCapabilities(const QStringList &capabilities);
-     static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+     static QByteArray getAuthentication(const QMailServiceConfiguration &svcCfg, const QStringList &capabilities);
 +#ifdef USE_ACCOUNTS_QT
-+    static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge, const QMail::SaslMechanism authType, const QString &password);
++    static QByteArray getResponse(const QMailServiceConfiguration &svcCfg, const QByteArray &challenge, const QMail::SaslMechanism authType, const QString &password);
 +#else
-     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
+     static QByteArray getResponse(const QMailServiceConfiguration &svcCfg, const QByteArray &challenge);
 +#endif
  };
  
@@ -1111,7 +1108,7 @@ index 4b65fc1e..88680e95 100644
             imapconfiguration.h \
             imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapauthenticator.cpp b/src/plugins/messageservices/imap/imapauthenticator.cpp
-index 6319aebb..dde528f3 100644
+index 22c6b602..7b1f92b7 100644
 --- a/src/plugins/messageservices/imap/imapauthenticator.cpp
 +++ b/src/plugins/messageservices/imap/imapauthenticator.cpp
 @@ -39,6 +39,16 @@
@@ -1129,9 +1126,9 @@ index 6319aebb..dde528f3 100644
 +}
 +#endif
  
- bool ImapAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ bool ImapAuthenticator::useEncryption(const ImapConfiguration &svcCfg, const QStringList &capabilities)
  {
-@@ -63,7 +73,79 @@ bool ImapAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceCo
+@@ -62,7 +72,78 @@ bool ImapAuthenticator::useEncryption(const ImapConfiguration &svcCfg, const QSt
      return QMailAuthenticator::useEncryption(svcCfg, capabilities);
  #endif
  }
@@ -1157,13 +1154,12 @@ index 6319aebb..dde528f3 100644
 +}
 +
 +
-+QByteArray ImapAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++QByteArray ImapAuthenticator::getAuthentication(const ImapConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
 +{
 +    QByteArray result;
-+    ImapConfiguration imapCfg(svcCfg);
-+    QMailAccountId id(imapCfg.id());
-+    QMail::SaslMechanism authType = static_cast<QMail::SaslMechanism>(imapCfg.mailAuthentication());
-+
++    QMailAccountId id(svcCfg.id());
++    QMail::SaslMechanism authType = static_cast<QMail::SaslMechanism>(svcCfg.mailAuthentication());
+ 
 +    // if we don't have auth yet, try to get it from the capabilities
 +    if (ssoLogin.size() > 1 && authType == QMail::NoMechanism) {
 +        qMailLog(IMAP) << "Discovering authentication from capabilities for account id:" << id;
@@ -1178,7 +1174,7 @@ index 6319aebb..dde528f3 100644
 +            }
 +        }
 +    }
- 
++
 +    if (authType != QMail::NoMechanism) {
 +        if (!ssoLogin.isEmpty()) {
 +            QList<QByteArray> auth;
@@ -1208,16 +1204,16 @@ index 6319aebb..dde528f3 100644
 +    return result;
 +}
 +#else
- QByteArray ImapAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ QByteArray ImapAuthenticator::getAuthentication(const ImapConfiguration &svcCfg, const QStringList &capabilities)
  {
      QByteArray result(QMailAuthenticator::getAuthentication(svcCfg, capabilities));
-@@ -79,10 +161,17 @@ QByteArray ImapAuthenticator::getAuthentication(const QMailAccountConfiguration:
-     return QByteArray("LOGIN") + ' ' + ImapProtocol::quoteString(imapCfg.mailUserName().toLatin1())
-                                + ' ' + ImapProtocol::quoteString(imapCfg.mailPassword().toLatin1());
+@@ -77,10 +158,17 @@ QByteArray ImapAuthenticator::getAuthentication(const ImapConfiguration &svcCfg,
+     return QByteArray("LOGIN") + ' ' + ImapProtocol::quoteString(svcCfg.mailUserName().toLatin1())
+                                + ' ' + ImapProtocol::quoteString(svcCfg.mailPassword().toLatin1());
  }
 +#endif
  
- QByteArray ImapAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ QByteArray ImapAuthenticator::getResponse(const ImapConfiguration &svcCfg, const QByteArray &challenge)
  {
 +#ifdef USE_ACCOUNTS_QT
 +    QByteArray response(QMailAuthenticator::getResponse(svcCfg, challenge, responseAuthType, authPassword));
@@ -1230,25 +1226,25 @@ index 6319aebb..dde528f3 100644
          return response;
  
 diff --git a/src/plugins/messageservices/imap/imapauthenticator.h b/src/plugins/messageservices/imap/imapauthenticator.h
-index 3a9bdf8d..02b3d67c 100644
+index b28b11ec..da36810d 100644
 --- a/src/plugins/messageservices/imap/imapauthenticator.h
 +++ b/src/plugins/messageservices/imap/imapauthenticator.h
 @@ -43,8 +43,13 @@ class ImapAuthenticator
  {
  public:
-     static bool useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+     static bool useEncryption(const ImapConfiguration &svcCfg, const QStringList &capabilities);
 +#ifdef USE_ACCOUNTS_QT
-+    static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
++    static QByteArray getAuthentication(const ImapConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
 +#else
-     static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+     static QByteArray getAuthentication(const ImapConfiguration &svcCfg, const QStringList &capabilities);
 +#endif
-     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
+     static QByteArray getResponse(const ImapConfiguration &svcCfg, const QByteArray &challenge);
 +
  };
  
  #endif
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 2db0af46..4b0e627a 100644
+index 6efcfa40..39a4c2d1 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -177,16 +177,23 @@ class IdleProtocol : public ImapProtocol {
@@ -1789,7 +1785,7 @@ index c0ec295c..f29335c6 100644
  
  #endif
 diff --git a/src/plugins/messageservices/imap/imapprotocol.cpp b/src/plugins/messageservices/imap/imapprotocol.cpp
-index 979cc274..ab8de4e3 100644
+index 4c058ffc..b0d49e42 100644
 --- a/src/plugins/messageservices/imap/imapprotocol.cpp
 +++ b/src/plugins/messageservices/imap/imapprotocol.cpp
 @@ -561,7 +561,11 @@ class LoginState : public ImapState
@@ -1843,9 +1839,9 @@ index 979cc274..ab8de4e3 100644
  QString LoginState::transmit(ImapContext *c)
  {
 +#ifdef USE_ACCOUNTS_QT
-+    return c->sendCommand(ImapAuthenticator::getAuthentication(_config.serviceConfiguration("imap4"), _capabilities, _ssoLogin));
++    return c->sendCommand(ImapAuthenticator::getAuthentication(ImapConfiguration(_config), _capabilities, _ssoLogin));
 +#else
-     return c->sendCommand(ImapAuthenticator::getAuthentication(_config.serviceConfiguration("imap4"), _capabilities));
+     return c->sendCommand(ImapAuthenticator::getAuthentication(ImapConfiguration(_config), _capabilities));
 +#endif
  }
  
@@ -2201,7 +2197,7 @@ index edcc1220..bdef288d 100644
             popconfiguration.h \
             popservice.h \
 diff --git a/src/plugins/messageservices/pop/popauthenticator.cpp b/src/plugins/messageservices/pop/popauthenticator.cpp
-index 34b9c422..843b1675 100644
+index a4499dcf..aea8a2a0 100644
 --- a/src/plugins/messageservices/pop/popauthenticator.cpp
 +++ b/src/plugins/messageservices/pop/popauthenticator.cpp
 @@ -38,6 +38,16 @@
@@ -2219,22 +2215,21 @@ index 34b9c422..843b1675 100644
 +}
 +#endif
  
- bool PopAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ bool PopAuthenticator::useEncryption(const PopConfiguration &svcCfg, const QStringList &capabilities)
  {
-@@ -68,6 +78,23 @@ bool PopAuthenticator::useEncryption(const QMailAccountConfiguration::ServiceCon
+@@ -67,6 +77,22 @@ bool PopAuthenticator::useEncryption(const PopConfiguration &svcCfg, const QStri
  #endif
  }
  
 +#ifdef USE_ACCOUNTS_QT
-+QList<QByteArray> PopAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++QList<QByteArray> PopAuthenticator::getAuthentication(const PopConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
 +{
 +    Q_UNUSED(capabilities);
 +    QList<QByteArray> result;
 +
 +    // Currently pop account does not have any auth settings, so only plain can be used
 +    if(ssoLogin.isEmpty()){
-+        PopConfiguration popCfg(svcCfg);
-+        qMailLog(POP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< popCfg.id()
++        qMailLog(POP) << Q_FUNC_INFO << "SSO identity is not found for account id: "<< svcCfg.id()
 +                      << ", returning empty authentication";
 +    } else {
 +        result = ssoLogin.value("PLAIN");
@@ -2242,16 +2237,16 @@ index 34b9c422..843b1675 100644
 +    return result;
 +}
 +#else
- QList<QByteArray> PopAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ QList<QByteArray> PopAuthenticator::getAuthentication(const PopConfiguration &svcCfg, const QStringList &capabilities)
  {
      QList<QByteArray> result;
-@@ -85,9 +112,13 @@ QList<QByteArray> PopAuthenticator::getAuthentication(const QMailAccountConfigur
+@@ -82,9 +108,13 @@ QList<QByteArray> PopAuthenticator::getAuthentication(const PopConfiguration &sv
  
      return result;
  }
 -
 +#endif
- QByteArray PopAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ QByteArray PopAuthenticator::getResponse(const PopConfiguration &svcCfg, const QByteArray &challenge)
  {
 +#ifdef USE_ACCOUNTS_QT
 +    return QMailAuthenticator::getResponse(svcCfg, challenge, responseAuthType, authPassword);
@@ -2261,23 +2256,23 @@ index 34b9c422..843b1675 100644
  }
  
 diff --git a/src/plugins/messageservices/pop/popauthenticator.h b/src/plugins/messageservices/pop/popauthenticator.h
-index a704ab57..419b9508 100644
+index 2bed3dd6..f422c9df 100644
 --- a/src/plugins/messageservices/pop/popauthenticator.h
 +++ b/src/plugins/messageservices/pop/popauthenticator.h
 @@ -43,7 +43,11 @@ class PopAuthenticator
  {
  public:
-     static bool useEncryption(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+     static bool useEncryption(const PopConfiguration &svcCfg, const QStringList &capabilities);
 +#ifdef USE_ACCOUNTS_QT
-+    static QList<QByteArray> getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
++    static QList<QByteArray> getAuthentication(const PopConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
 +#else
-     static QList<QByteArray> getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+     static QList<QByteArray> getAuthentication(const PopConfiguration &svcCfg, const QStringList &capabilities);
 +#endif
-     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
+     static QByteArray getResponse(const PopConfiguration &svcCfg, const QByteArray &challenge);
  };
  
 diff --git a/src/plugins/messageservices/pop/popclient.cpp b/src/plugins/messageservices/pop/popclient.cpp
-index e605a34d..1be54f9a 100644
+index 9eb48fc6..3317e56b 100644
 --- a/src/plugins/messageservices/pop/popclient.cpp
 +++ b/src/plugins/messageservices/pop/popclient.cpp
 @@ -77,10 +77,18 @@ PopClient::PopClient(QObject* parent)
@@ -2370,9 +2365,9 @@ index e605a34d..1be54f9a 100644
  
          // Get the login command sequence to use
 +#ifdef USE_ACCOUNTS_QT
-+        authCommands = PopAuthenticator::getAuthentication(config.serviceConfiguration("pop3"), capabilities, ssoLogin);
++        authCommands = PopAuthenticator::getAuthentication(PopConfiguration(config), capabilities, ssoLogin);
 +#else
-         authCommands = PopAuthenticator::getAuthentication(config.serviceConfiguration("pop3"), capabilities);
+         authCommands = PopAuthenticator::getAuthentication(PopConfiguration(config), capabilities);
 +#endif
  
          nextStatus = Auth;
@@ -2627,10 +2622,10 @@ index a987d84a..62f60541 100644
             smtpclient.h \
             smtpconfiguration.h \
 diff --git a/src/plugins/messageservices/smtp/smtpauthenticator.cpp b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
-index 76fb904e..d1d5a2ff 100644
+index a0b15f3f..4a2d3ae1 100644
 --- a/src/plugins/messageservices/smtp/smtpauthenticator.cpp
 +++ b/src/plugins/messageservices/smtp/smtpauthenticator.cpp
-@@ -36,14 +36,124 @@
+@@ -36,14 +36,123 @@
  #include "smtpconfiguration.h"
  
  #include <qmailauthenticator.h>
@@ -2696,16 +2691,15 @@ index 76fb904e..d1d5a2ff 100644
 +    return result;
  }
  
-+QByteArray SmtpAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
++QByteArray SmtpAuthenticator::getAuthentication(const SmtpConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin)
 +{
 +    QByteArray result;
-+    SmtpConfiguration smtpCfg(svcCfg);
-+    QMailAccountId id(smtpCfg.id());
-+    SmtpConfiguration::AuthType authType = static_cast<SmtpConfiguration::AuthType>(smtpCfg.smtpAuthentication());
++    QMailAccountId id(svcCfg.id());
++    SmtpConfiguration::AuthType authType = static_cast<SmtpConfiguration::AuthType>(svcCfg.smtpAuthentication());
 +
 +    // if we don't have auth yet, try to get it from the capabilities
 +    if (ssoLogin.size() > 1 && authType == SmtpConfiguration::Auth_NONE
-+            && smtpCfg.smtpAuthFromCapabilities()) {
++            && svcCfg.smtpAuthFromCapabilities()) {
 +        qMailLog(SMTP) << "Discovering authentication from capabilities for account id:" << id;
 +        authType = authFromCapabilities(capabilities, ssoLogin);;
 +        if (authType != SmtpConfiguration::Auth_NONE) {
@@ -2752,18 +2746,18 @@ index 76fb904e..d1d5a2ff 100644
 +}
 +
 +#else
- QByteArray SmtpAuthenticator::getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities)
+ QByteArray SmtpAuthenticator::getAuthentication(const SmtpConfiguration &svcCfg, const QStringList &capabilities)
  {
      QByteArray result(QMailAuthenticator::getAuthentication(svcCfg, capabilities));
-@@ -72,6 +182,7 @@ QByteArray SmtpAuthenticator::getAuthentication(const QMailAccountConfiguration:
+@@ -71,6 +180,7 @@ QByteArray SmtpAuthenticator::getAuthentication(const SmtpConfiguration &svcCfg,
      }
      return result;
  }
 +#endif
  
- QByteArray SmtpAuthenticator::getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge)
+ QByteArray SmtpAuthenticator::getResponse(const SmtpConfiguration &svcCfg, const QByteArray &challenge)
  {
-@@ -85,9 +196,14 @@ QByteArray SmtpAuthenticator::getResponse(const QMailAccountConfiguration::Servi
+@@ -84,9 +194,14 @@ QByteArray SmtpAuthenticator::getResponse(const SmtpConfiguration &svcCfg, const
          if (responses.isEmpty())
              gResponses.erase(it);
      } else {
@@ -2780,31 +2774,23 @@ index 76fb904e..d1d5a2ff 100644
  }
 -
 diff --git a/src/plugins/messageservices/smtp/smtpauthenticator.h b/src/plugins/messageservices/smtp/smtpauthenticator.h
-index 97300b99..23f31cb2 100644
+index a0ec617c..f92df9ad 100644
 --- a/src/plugins/messageservices/smtp/smtpauthenticator.h
 +++ b/src/plugins/messageservices/smtp/smtpauthenticator.h
-@@ -34,6 +34,7 @@
- #ifndef SMTPAUTHENTICATOR_H
- #define SMTPAUTHENTICATOR_H
- 
-+#include "smtpconfiguration.h"
- #include <qmailaccountconfiguration.h>
- 
- #include <QByteArray>
-@@ -42,7 +43,11 @@
+@@ -42,7 +42,11 @@
  class SmtpAuthenticator
  {
  public:
 +#ifdef USE_ACCOUNTS_QT
-+    static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
++    static QByteArray getAuthentication(const SmtpConfiguration &svcCfg, const QStringList &capabilities, const QMap<QString, QList<QByteArray> > &ssoLogin);
 +#else
-     static QByteArray getAuthentication(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QStringList &capabilities);
+     static QByteArray getAuthentication(const SmtpConfiguration &svcCfg, const QStringList &capabilities);
 +#endif
-     static QByteArray getResponse(const QMailAccountConfiguration::ServiceConfiguration &svcCfg, const QByteArray &challenge);
+     static QByteArray getResponse(const SmtpConfiguration &svcCfg, const QByteArray &challenge);
  };
  
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index 7308ef81..aff16aea 100644
+index 9ca9bf72..020d2972 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -113,6 +113,11 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -2883,7 +2869,7 @@ index 7308ef81..aff16aea 100644
 +            // Use credentials from accounts db
 +            // Find the authentication mode to use
 +            ssoLogin.clear();
-+            QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
++            QByteArray authCmd(SmtpAuthenticator::getAuthentication(SmtpConfiguration(config), capabilities, ssoLogin));
 +            if (!authCmd.isEmpty()) {
 +                sendCommand(authCmd);
 +                status = Authenticating;
@@ -2899,7 +2885,7 @@ index 7308ef81..aff16aea 100644
 +            }
 +        }
 +#else
-         QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities));
+         QByteArray authCmd(SmtpAuthenticator::getAuthentication(SmtpConfiguration(config), capabilities));
          if (!authCmd.isEmpty()) {
              sendCommand(authCmd);
 @@ -587,8 +647,40 @@ void SmtpClient::nextAction(const QString &response)
@@ -2925,7 +2911,7 @@ index 7308ef81..aff16aea 100644
 +            }
 +        } else {
 +            if (!ssoSessionManager->waitForSso()) {
-+                QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
++                QByteArray authCmd(SmtpAuthenticator::getAuthentication(SmtpConfiguration(config), capabilities, ssoLogin));
 +                if (!authCmd.isEmpty()) {
 +                    sendCommand(authCmd);
 +                    status = Authenticating;
@@ -3030,7 +3016,7 @@ index 7308ef81..aff16aea 100644
 +        ssoLogin = ssoCredentials;
 +        if (sendLogin) {
 +            sendLogin = false;
-+            QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
++            QByteArray authCmd(SmtpAuthenticator::getAuthentication(SmtpConfiguration(config), capabilities, ssoLogin));
 +            if (!authCmd.isEmpty()) {
 +                sendCommand(authCmd);
 +                status = Authenticating;
@@ -3151,10 +3137,10 @@ index cf4ad0ff..38fd54ab 100644
  }
  
 diff --git a/src/plugins/plugins.pro b/src/plugins/plugins.pro
-index dc1528b7..5226faa1 100644
+index 9be3a152..287e81de 100644
 --- a/src/plugins/plugins.pro
 +++ b/src/plugins/plugins.pro
-@@ -11,3 +11,6 @@ exists(/usr/bin/gpgme-config) {
+@@ -10,3 +10,6 @@ exists(/usr/bin/gpgme-config) {
      SUBDIRS += crypto/smime
  }
  

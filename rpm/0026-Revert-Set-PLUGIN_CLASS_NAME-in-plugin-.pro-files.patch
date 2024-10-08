@@ -10,9 +10,8 @@ This reverts commit 2051e62107bb25c43d228241a2e054c02d440d2f.
  src/plugins/crypto/smime/smime.pro                               | 1 -
  src/plugins/messageservices/imap/imap.pro                        | 1 -
  src/plugins/messageservices/pop/pop.pro                          | 1 -
- src/plugins/messageservices/qmfsettings/qmfsettings.pro          | 1 -
  src/plugins/messageservices/smtp/smtp.pro                        | 1 -
- 7 files changed, 7 deletions(-)
+ 6 files changed, 6 deletions(-)
 
 diff --git a/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro b/src/plugins/contentmanagers/qmfstoragemanager/qmfstoragemanager.pro
 index 60fdd366..e34de9d4 100644
@@ -74,18 +73,6 @@ index 798a7079..eb96f74d 100644
  load(qt_plugin)
  
  QT = core network qmfclient qmfclient-private qmfmessageserver
-diff --git a/src/plugins/messageservices/qmfsettings/qmfsettings.pro b/src/plugins/messageservices/qmfsettings/qmfsettings.pro
-index fd535849..9ff2cfcc 100644
---- a/src/plugins/messageservices/qmfsettings/qmfsettings.pro
-+++ b/src/plugins/messageservices/qmfsettings/qmfsettings.pro
-@@ -1,7 +1,6 @@
- TEMPLATE = lib
- TARGET = qmfsettings
- PLUGIN_TYPE = messageservices
--PLUGIN_CLASS_NAME = QmfSettingsPlugin
- load(qt_plugin)
- 
- QT = core network qmfclient qmfmessageserver
 diff --git a/src/plugins/messageservices/smtp/smtp.pro b/src/plugins/messageservices/smtp/smtp.pro
 index c736842b..7663a28a 100644
 --- a/src/plugins/messageservices/smtp/smtp.pro

@@ -10,7 +10,7 @@ Similar to what is already done for IMAP.
  2 files changed, 12 insertions(+)
 
 diff --git a/src/plugins/messageservices/smtp/smtpclient.cpp b/src/plugins/messageservices/smtp/smtpclient.cpp
-index aff16aea..5cb3df9d 100644
+index 020d2972..2f23f31a 100644
 --- a/src/plugins/messageservices/smtp/smtpclient.cpp
 +++ b/src/plugins/messageservices/smtp/smtpclient.cpp
 @@ -117,6 +117,8 @@ SmtpClient::SmtpClient(QObject* parent)
@@ -31,14 +31,14 @@ index aff16aea..5cb3df9d 100644
 +            ssoSessionManager->recreateSsoIdentity();
          } else {
              if (!ssoSessionManager->waitForSso()) {
-                 QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
+                 QByteArray authCmd(SmtpAuthenticator::getAuthentication(SmtpConfiguration(config), capabilities, ssoLogin));
 @@ -1189,6 +1194,8 @@ void SmtpClient::onSsoSessionResponse(const QMap<QString, QList<QByteArray> > &s
          ssoLogin = ssoCredentials;
          if (sendLogin) {
              sendLogin = false;
 +            recreateIdentity = false;
 +            recreateIdentityCount = 0;
-             QByteArray authCmd(SmtpAuthenticator::getAuthentication(config.serviceConfiguration("smtp"), capabilities, ssoLogin));
+             QByteArray authCmd(SmtpAuthenticator::getAuthentication(SmtpConfiguration(config), capabilities, ssoLogin));
              if (!authCmd.isEmpty()) {
                  sendCommand(authCmd);
 @@ -1206,6 +1213,9 @@ void SmtpClient::onSsoSessionError(const QString &error)
