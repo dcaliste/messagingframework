@@ -27,7 +27,7 @@ index c7173949..f93f39e1 100644
      int tokenCount = tokens.count();
      if ( tokenCount > 0 ) {
 diff --git a/src/libraries/qmfclient/support/qmailnamespace.cpp b/src/libraries/qmfclient/support/qmailnamespace.cpp
-index b9a30477..c28dda6e 100644
+index 07eb4351..444df692 100644
 --- a/src/libraries/qmfclient/support/qmailnamespace.cpp
 +++ b/src/libraries/qmfclient/support/qmailnamespace.cpp
 @@ -420,28 +420,28 @@ QMap<QByteArray, QStringList> standardFolderTranslations()
@@ -66,10 +66,10 @@ index b9a30477..c28dda6e 100644
          }
      }
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index 9cf6fd3a..f5c6bf2d 100644
+index 43be5a15..29060479 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
-@@ -144,7 +144,7 @@ bool ImapConfiguration::intervalCheckRoamingEnabled() const
+@@ -124,7 +124,7 @@ bool ImapConfiguration::intervalCheckRoamingEnabled() const
  
  QStringList ImapConfiguration::capabilities() const
  {

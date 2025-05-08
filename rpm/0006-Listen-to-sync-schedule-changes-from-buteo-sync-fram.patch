@@ -27,10 +27,10 @@ index 023d6a96..c4ba87c0 100644
  contains(DEFINES, USE_KEEPALIVE) {
      PKGCONFIG += keepalive
 diff --git a/src/plugins/messageservices/imap/imapconfiguration.cpp b/src/plugins/messageservices/imap/imapconfiguration.cpp
-index af37630e..2483f1ef 100644
+index e99620f7..43be5a15 100644
 --- a/src/plugins/messageservices/imap/imapconfiguration.cpp
 +++ b/src/plugins/messageservices/imap/imapconfiguration.cpp
-@@ -102,7 +102,7 @@ QString ImapConfiguration::preferredTextSubtype() const
+@@ -104,7 +104,7 @@ QString ImapConfiguration::preferredTextSubtype() const
  
  bool ImapConfiguration::pushEnabled() const
  {
@@ -39,7 +39,7 @@ index af37630e..2483f1ef 100644
  }
  
  QString ImapConfiguration::baseFolder() const
-@@ -270,7 +270,7 @@ void ImapConfigurationEditor::setPreferredTextSubtype(const QString &str)
+@@ -272,7 +272,7 @@ void ImapConfigurationEditor::setPreferredTextSubtype(const QString &str)
  
  void ImapConfigurationEditor::setPushEnabled(bool b)
  {
@@ -49,7 +49,7 @@ index af37630e..2483f1ef 100644
  
  void ImapConfigurationEditor::setBaseFolder(const QString &s)
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index 34ddd0f0..da9d2ebd 100644
+index 31313969..44f7536c 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -46,6 +46,10 @@
@@ -63,7 +63,7 @@ index 34ddd0f0..da9d2ebd 100644
  namespace { 
  
  const QString serviceKey("imap4");
-@@ -1463,6 +1467,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
+@@ -1469,6 +1473,13 @@ ImapService::ImapService(const QMailAccountId &accountId)
      connect(_restartPushEmailTimer, SIGNAL(timeout()), this, SLOT(restartPushEmail()));
      connect(QMailStore::instance(), SIGNAL(accountsUpdated(const QMailAccountIdList&)), 
              this, SLOT(accountsUpdated(const QMailAccountIdList&)));
@@ -77,7 +77,7 @@ index 34ddd0f0..da9d2ebd 100644
  }
  
  void ImapService::enable()
-@@ -1833,6 +1844,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
+@@ -1835,6 +1846,24 @@ void ImapService::setPersistentConnectionStatus(bool status)
      _idling = status;
  }
  
@@ -103,7 +103,7 @@ index 34ddd0f0..da9d2ebd 100644
  {
  public:
 diff --git a/src/plugins/messageservices/imap/imapservice.h b/src/plugins/messageservices/imap/imapservice.h
-index 7b24794a..4cf549a5 100644
+index 41493a31..b7e0ffda 100644
 --- a/src/plugins/messageservices/imap/imapservice.h
 +++ b/src/plugins/messageservices/imap/imapservice.h
 @@ -75,6 +75,8 @@ protected slots:

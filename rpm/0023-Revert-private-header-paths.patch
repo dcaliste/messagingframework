@@ -22,7 +22,7 @@ Subject: [PATCH] Revert private header paths
  15 files changed, 15 insertions(+), 15 deletions(-)
 
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 4eaff89a..b4d9406d 100644
+index 1dc17268..52358ee6 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -35,7 +35,7 @@
@@ -48,7 +48,7 @@ index 3002ffe8..c5c01d1c 100644
  #include <qmailtransport.h>
  #include <qmailcredentials.h>
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index b27dc4f6..9315699b 100644
+index 69cfb2a5..53f06453 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -34,7 +34,7 @@

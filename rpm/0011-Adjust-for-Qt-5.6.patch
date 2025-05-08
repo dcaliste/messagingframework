@@ -10,10 +10,10 @@ Subject: [PATCH] Adjust for Qt 5.6
  3 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
-index 9ed8256a..9c723962 100644
+index adb24f19..cdba17ba 100644
 --- a/src/libraries/qmfclient/libaccounts_p.cpp
 +++ b/src/libraries/qmfclient/libaccounts_p.cpp
-@@ -551,7 +551,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
+@@ -515,7 +515,7 @@ QMailAccount LibAccountManager::account(const QMailAccountId &id) const
      if ((static_cast<uint>(account->valueAsUInt64(QLatin1String("lastSynchronized")))) == 0) {
          result.setLastSynchronized(QMailTimeStamp());
      } else {
@@ -22,7 +22,7 @@ index 9ed8256a..9c723962 100644
      }
  
      result.setIconPath(account->valueAsString(QLatin1String("iconPath")));
-@@ -904,7 +904,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
+@@ -875,7 +875,7 @@ bool LibAccountManager::updateSharedAccount(QMailAccount *account,
          sharedAccount->setValue(QLatin1String("emailaddress"), account->fromAddress().address());
          sharedAccount->setValue(QLatin1String("fullName"), account->fromAddress().name());
          if (account->lastSynchronized().isValid()) {

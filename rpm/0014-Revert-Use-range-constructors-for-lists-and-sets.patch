@@ -309,7 +309,7 @@ index 2600292d..ed7babb6 100644
          transmissionInProgressIds = idSet;
          transmissionSetInitialized = true;
 diff --git a/src/plugins/messageservices/imap/imapservice.cpp b/src/plugins/messageservices/imap/imapservice.cpp
-index c9e014f2..ddd5480b 100644
+index 44f7536c..e20b9ba1 100644
 --- a/src/plugins/messageservices/imap/imapservice.cpp
 +++ b/src/plugins/messageservices/imap/imapservice.cpp
 @@ -1223,7 +1223,7 @@ bool ImapService::Source::prepareMessages(const QList<QPair<QMailMessagePart::Lo
@@ -322,7 +322,7 @@ index c9e014f2..ddd5480b 100644
  
          for (const QMailMessageMetaData &metaData : QMailStore::instance()->messagesMetaData(key, props)) {
 diff --git a/src/plugins/messageservices/imap/imapstrategy.cpp b/src/plugins/messageservices/imap/imapstrategy.cpp
-index f6a54592..b27dc4f6 100644
+index 18e21c33..69cfb2a5 100644
 --- a/src/plugins/messageservices/imap/imapstrategy.cpp
 +++ b/src/plugins/messageservices/imap/imapstrategy.cpp
 @@ -349,15 +349,13 @@ QSet<QMailFolderId> foldersApplicableTo(QMailMessageKey const& messagekey, QSet<

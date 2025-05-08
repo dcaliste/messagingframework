@@ -1,0 +1,36 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Damien Caliste <dcaliste@free.fr>
+Date: Wed, 7 May 2025 14:55:46 +0200
+Subject: [PATCH] Support sync policy at account root level.
+
+Keep backward compatibility when the sync
+policy was saved at the account root level
+and not at the service level.
+
+Change-Id: Iaecdbd01c0bf87079dce0a32f842a639bf47d885
+---
+ src/libraries/qmfclient/libaccounts_p.cpp | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/src/libraries/qmfclient/libaccounts_p.cpp b/src/libraries/qmfclient/libaccounts_p.cpp
+index f0747d3b..adb24f19 100644
+--- a/src/libraries/qmfclient/libaccounts_p.cpp
++++ b/src/libraries/qmfclient/libaccounts_p.cpp
+@@ -591,6 +591,17 @@ QMailAccountConfiguration LibAccountManager::accountConfiguration(const QMailAcc
+         }
+     }
+ 
++    // Backward compatibility patch
++    account->selectService();
++    const QString syncPolicy = account->valueAsString(QLatin1String("folderSyncPolicy"));
++    if (!syncPolicy.isEmpty() && result.services().contains(QLatin1String("imap4"))) {
++        QMailAccountConfiguration::ServiceConfiguration* serviceConfig
++            = &result.serviceConfiguration(QLatin1String("imap4"));
++        Q_ASSERT(serviceConfig);
++        if (serviceConfig->value(QLatin1String("folderSyncPolicy")).isEmpty())
++            serviceConfig->setValue(QLatin1String("folderSyncPolicy"), syncPolicy);
++    }
++
+     result.setId(id);
+     setModified(&result, false);
+ 

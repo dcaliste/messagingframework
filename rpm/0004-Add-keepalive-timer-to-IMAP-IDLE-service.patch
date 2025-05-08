@@ -28,7 +28,7 @@ index 0af76d22..023d6a96 100644
             imapconfiguration.h \
             imapmailboxproperties.h \
 diff --git a/src/plugins/messageservices/imap/imapclient.cpp b/src/plugins/messageservices/imap/imapclient.cpp
-index 416c6e72..4eaff89a 100644
+index 29288da3..1dc17268 100644
 --- a/src/plugins/messageservices/imap/imapclient.cpp
 +++ b/src/plugins/messageservices/imap/imapclient.cpp
 @@ -449,9 +449,15 @@ ImapClient::ImapClient(const QMailAccountId &id, QObject* parent)
@@ -47,7 +47,7 @@ index 416c6e72..4eaff89a 100644
  
      connect(QMailMessageBuffer::instance(), SIGNAL(flushed()), this, SLOT(messageBufferFlushed()));
  
-@@ -1674,10 +1680,16 @@ bool ImapClient::isPushEmailEstablished()
+@@ -1670,10 +1676,16 @@ bool ImapClient::isPushEmailEstablished()
  
  void ImapClient::setIdlingForFolder(const QMailFolderId &id)
  {
@@ -64,7 +64,7 @@ index 416c6e72..4eaff89a 100644
      if (!_waitingForIdleFolderIds.isEmpty()) {
          _waitingForIdleFolderIds.removeOne(id);
          if (_waitingForIdleFolderIds.isEmpty()) {
-@@ -1707,7 +1719,11 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
+@@ -1725,7 +1737,11 @@ void ImapClient::monitor(const QMailFolderIdList &mailboxIds)
      static int count(0);
  
      if (mailboxIds.isEmpty()) {
@@ -77,7 +77,7 @@ index 416c6e72..4eaff89a 100644
  
      foreach(const QMailFolderId &id, _monitored.keys()) {
 diff --git a/src/plugins/messageservices/imap/imapclient.h b/src/plugins/messageservices/imap/imapclient.h
-index 8edc94b9..bb2e1354 100644
+index 9d49e30d..e834c6ae 100644
 --- a/src/plugins/messageservices/imap/imapclient.h
 +++ b/src/plugins/messageservices/imap/imapclient.h
 @@ -47,6 +47,9 @@
